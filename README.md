@@ -44,6 +44,26 @@ start:
 ```
 The program would first call the epic function, which will call the kernel syscall for write(1,"Hello World!",10). However, what would happen after we reached syscall? In x86_64, the `%rip` register (Relative Instruction Pointer) points to the next instruction after, but there are no other instructions in the `epic` function. But, what is below the epic function? That's right; the `start` function! Meaning, the next instruction in the binary will be `call epic`, so after the syscall we'd end up at the first instruction of `start`, which would take us back to `epic` and result in an infinite loop of printing println("Hello World!")! Party's auto return feature prevents you from making these mistakes, so you don't need to worry about inserting a `return` at the end of your functions since the compiler will do it for you.
 
+```s
+global start
+section .text
+
+epic:
+ mov rax, 0x2000004 ; write
+ mov rdi, 1 ; stdout
+ mov rsi, msg
+ mov rdx, msg.len
+ syscall
+ ret
+
+start:
+ call epic
+ mov rax, 0x2000001 ; exit
+ mov rdi, 0
+ syscall
+ ret
+```
+
 If you ever need to, you can turn auto return off via `#define __NO_AUTORETURN 1`, and turn it back on with `#define __NO_AUTORETURN 0`.
 
 ### "Blind" Assembly
