@@ -1,0 +1,23 @@
+int a = 5
+
+funky epic {
+  !println("Hello!")
+  !print("foo")
+  !println("bar")
+  repeat(5) {
+    !print("a")
+  }
+  !println("")
+  a = a + 1
+  // a is now 6
+  if (a == 6) {
+    println("a is 6")
+    return
+  }
+  println("This code will never be executed")
+}
+
+funky start {
+  !epic
+  # !exit(0)
+}

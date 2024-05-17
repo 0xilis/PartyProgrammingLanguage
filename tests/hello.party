@@ -1,0 +1,21 @@
+/* Disable auto return for epic function */
+#define __NO_AUTORETURN 1
+
+funky epic {
+  !println("Hello World!")
+  /* we need to do a return or else inf loop */
+  blind {
+  mov rdi, 0
+  }
+  return
+  nothing
+}
+
+/* Re-enable auto return */
+#define __NO_AUTORETURN 0
+
+funky start {
+  !epic
+  // we need to call exit(0) or else we will SEGV
+  !exit
+}
