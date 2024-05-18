@@ -238,7 +238,7 @@ def compile(path, outpath):
                 registerForArg = registerCallingConversions[argc]
                 outf.write(" mov " + registerForArg + ", " + arg + "\n")
                 argc += 1
-              outf.write("syscall\n")
+              outf.write(" syscall\n")
             else:
               if existingName not in declaredFunctions:
                 print("PARTY ERROR: Function does not exist (" + existingName + ").")
