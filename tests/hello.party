@@ -17,5 +17,13 @@ funky epic {
 funky start {
   !epic
   // we need to call exit(0) or else we will SEGV
-  !exit
+  //!exit
+  /* Party has syscall() to let us invoke kernel syscalls */
+  /* For a list for macOS, see https://github.com/opensource-apple/xnu/blob/master/bsd/kern/syscalls.master */
+  /* We should just use the normal !exit but, as an example for !syscall() */
+  /* I'm going to invoke the exit function in the kernel using !syscall */
+  /* Basically, we're talking to the kernel and say, hey, kernel, exit us */
+  /* And the XNU kernel closes our task. */
+  /* This is the same as !exit */
+  !syscall(0x2000001, 0)
 }

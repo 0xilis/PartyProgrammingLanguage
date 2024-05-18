@@ -70,6 +70,10 @@ If you ever need to, you can turn auto return off via `#define __NO_AUTORETURN 1
 
 Party supports doing "blind" inline assembly via `blind {}`. What this means is that it will forcibly insert whatever assembly you put in and not make changes to the rest of the code to account for this inline assembly. This is useful when you need to do things that the Party programming language does not yet support.
 
+### Supported Functions
+
+Party, in its current state, does not support libraries, meaning there is no "Party standard library" at the moment, nor can you call any function from a dylib. This means that all current functions are wrappers for syscall functions. `!println()` is a function where you can easily write to STDOUT (print to console). Pass in a string to it, and you're golden. `!exit` is a function in which it is a wrapper for exit(0) syscall. There currently is only an argless version, but a version using args for stuff like exit(1) may be added soon. `!syscall()` is identical to libc's `syscall()` for wrapping syscalls to invoke in the kernel, only exception is that Party will inline the syscall invocation itself.
+
 ### (Not Yet Implemented) Variable types
 
 Party has `int` and `string` types. In C, most compilers will make `int` a 32-bit integer even on 64bit machines. However, Party has all `int`s be 64-bit. Be aware that there is no unsigned int type.
