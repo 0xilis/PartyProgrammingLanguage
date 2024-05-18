@@ -1,0 +1,15 @@
+funky start {
+  string introduction = "This is in example of cool things you can do with Party's !syscall()"
+  !println(introduction)
+  !println("Making a directory at /tmp/cool via invoking the kernel syscall for mkdir...")
+  !syscall(0x2000088, "/tmp/cool", 0x1a4)
+  !println("Making a symlink to that directory at /tmp/reallycool via invoking the kernel syscall for symlink...")
+  !syscall(0x2000039, "/tmp/reallycool", "/tmp/cool")
+  !println("Remove the symlink by calling unlink...")
+  !syscall(0x200000a, "/tmp/reallycool")
+  !println("And finally; removing the /tmp/cool directory...")
+  !syscall(0x2000089, "/tmp/reallycool")
+  !println("That's all for now! Exiting...")
+  !exit
+  return
+}

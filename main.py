@@ -80,13 +80,11 @@ def super_duper_arg_parser(argsString):
   currentArgsString = argsString
   commaIndex = argsString.find(",")
   prevCommaIndex = 0
-  print("argsString: " + argsString)
   while (commaIndex != -1):
     currentArgsString = argsString[prevCommaIndex:commaIndex].replace(",","")
     prevCommaIndex = commaIndex
-    print("currentArgsString: " + currentArgsString)
     args = parse_one_arg(currentArgsString, args) 
-    commaIndex = argsString[commaIndex+1:].find(",")
+    commaIndex = currentArgsString[commaIndex+1:].find(",")
   # The last arg
   if prevCommaIndex == 0:
     # One arg only in argsString
@@ -198,28 +196,7 @@ def compile(path, outpath):
               existingName = nospaces.replace("\n", "")[1:]
             else:
               existingName = nospaces.replace("\n", "")[1:argBeginIndex]
-            if existingName == "print":
-              # print declaration
-              argBeginIndex = inputline.find("(")
-              # TODO: Oh yeah uh this will have problems with strings that contain ) oops
-              argEndIndex = inputline.find(")")
-              argsString = inputline[argBeginIndex:argEndIndex]
-              # TODO: Check for valid arguments
-              # TODO: Check __DATA_cache to see arg
-              args = super_duper_arg_parser(argsString)
-              # println is special in the syscall wrappers
-              outf.write(" mov rax, 0x2000004\n")
-              outf.write(" mov rdi, 1\n")
-              outf.write(" mov rsi, " + args[0] + "\n")
-              print("args: " + str(args))
-              internalVarNameIndex = internalVarNames.index(args[0])
-              if internalVarNameIndex == -1:
-                print("PARTY ERROR: Variable not declared.")
-                end_compile(outf,inf)
-                return
-              outf.write(" mov rdx, " + str(internalStringsLen[internalVarNameIndex]) + "\n")
-              outf.write(" syscall\n")
-            elif existingName == "println":
+            if existingName == "println":
               # println declaration
               argBeginIndex = inputline.find("(")
               argEndIndex = inputline.find(")")
@@ -229,7 +206,6 @@ def compile(path, outpath):
               outf.write(" mov rax, 0x2000004\n")
               outf.write(" mov rdi, 1\n")
               outf.write(" mov rsi, " + args[0] + "\n")
-              print("args: " + str(args))
               internalVarNameIndex = internalVarNames.index(args[0])
               if internalVarNameIndex == -1:
                 print("PARTY ERROR: Variable not declared.")
