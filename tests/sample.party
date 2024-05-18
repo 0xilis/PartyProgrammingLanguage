@@ -1,0 +1,61 @@
+funky joe_cool {
+  !println("We're in joe_cool now!")
+  !println("Also; if you're reading the sample.party file...")
+  !println("Notice how there are no args for joe_cool?")
+  !println("Party allows you to have functions with no args!")
+  !println("Party currently does not support function args; but when they are; this will still remain in-tact.")
+  !println("Party also has auto return on functions.")
+  !println("This means that it will auto insert a return at the end of functions.")
+  !println("Meaning you don't have to constantly write return; and don't have to worry about undefined behavior if you forget to.")
+  !println("With that being said; you can still use return to return from functions if you wish!")
+  !println("Let's return from here...")
+  return
+  !println("Uh-oh. This code should have been unreachable.")
+  !syscall(0x2000001,1)
+}
+
+funky start {
+  !println("Welcome to the Party programming language.")
+  !println("Party is a compiled language; with the compiler made entirely in Python!")
+  !println("It's limited; but that at the very least comes with the benefit of being easy to learn [in my opinion]")
+  !println("Commas are not supported in strings; hence why I am using a lot of semi-colons right now.")
+  !println("Look below these println calls in the sample.party file; there are some comments.")
+  /*
+   Hello! These are multi-line Party comments.
+   You can use them for clarity on your codebase.
+   They don't affect the end speed of your program,
+   as they aren't included in the compiled binary,
+   so you don't need to worry about including too many.
+   At least, not speed-wise.
+   
+   If you're wondering why I did [] for the println
+   Instead of (), it's because you cannot use
+   () in a string currently in Party. You also
+   cannot include " in the middle of a string.
+   Be aware however that this likely will change soon
+   if I ever decide to flush Party out more.
+
+   Oh, and I should mention, you can also do
+   */
+   //Single line comments like this!
+  !println("Above is clarity for why I did [] for these.")
+  !println("It also shows off how single-line comments work.")
+  !println("That's why I asked you to look. It's helpful!")
+  !println("Now; lets call a function.")
+  !println("The function we are going to call is named joe_cool.")
+  !println("Calling now!")
+  !joe_cool
+  !println("And now; we're back in start!")
+  !println("In Party; think of start as the main function.")
+  !println("Unlike C; which has start auto call main; Party just uses start by itself.")
+  !println("You can also insert nops into the assembly by doing this: ")
+  nothing
+  !println("You can also insert inline assembly by doing: ")
+  blind {
+  mov rdi, 0 ;blind inline assembly!
+  }
+  !println("This is the end of the sample. We're going to exit using !exit.")
+  !println("!exit is a wrapper for exit[0] syscall.")
+  !println("This is all for our sample. Bye for now!")
+  !exit
+}

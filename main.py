@@ -38,9 +38,13 @@ def parse_one_arg(argString, args):
   if (stringStartIndex != -1 and stringEndIndex != -1):
     # String
     daString = argString[stringStartIndex+1:stringEndIndex+1]
+    # Dumb workaround: Remove " if end with it...
+    if daString.endswith("\""):
+      daString = daString[:-1]
     daStringLen = len(daString)
     protoVarCount += 1
     internalVarName = protoVarName + str(protoVarCount)
+    print("internalVarName: " + internalVarName)
     internalVarNames.append(internalVarName)
     internalStringsLen.append(daStringLen)
     dataLine1 = internalVarName + ": db \"" + daString + "\"," + str(daStringLen) + "\n"
@@ -66,6 +70,9 @@ def super_duper_arg_parser(argsString):
   # TODO: This will have issues when "," is used in strings but not sure if I'll have enough time for final to support that
   global internalVarNames
   global internalStringsLen
+  if argsString.startswith("("):
+    # Dumb workaround... remove ( if start of argsString
+    argsString = argsString[1:]
   args = []
   currentArgsString = argsString
   commaIndex = argsString.find(",")
@@ -75,39 +82,14 @@ def super_duper_arg_parser(argsString):
     currentArgsString = argsString[prevCommaIndex:commaIndex].replace(",","")
     prevCommaIndex = commaIndex
     print("currentArgsString: " + currentArgsString)
-    args = parse_one_arg(currentArgsString, args)
-    '''
-    stringStartIndex = currentArgsString.find("\"")
-    # TODO: Issues when \" is used in strings
-    stringEndIndex = currentArgsString.find("\"",stringStartIndex+1)
-    if (stringStartIndex != -1 and stringEndIndex != -1):
-      # String
-      daString = currentArgsString[stringStartIndex+1:stringEndIndex]
-      daStringLen = daString.len()
-      protoVarCount += 1
-      internalVarName = "PartyInternalVar_" + str(protoVarCount)
-      internalVarNames.append(internalVarName)
-      internalStringsLen.appned(daStringLen)
-      dataLine1 = internalVarName + ": db \"" + daString + "\"," + str(daStringLen) + "\n"
-      dataLine2 = ".len: equ $ - " + internalVarName + "\n"
-      init_segment_data()
-      segment_data += dataLine1 + dataLine2
-      args.append(internalVarName)
-    else:
-      # Int or var name
-      currentArgsStringNoSpace = currentArgsString.replace(" ", "")
-      if currentArgsStringNoSpace in declaredVariables:
-        # Var name
-        args.append(currentArgsStringNoSpace)
-      else:
-        # Integer
-        args.append(currentArgsStringNoSpace)
-    '''
-    
+    args = parse_one_arg(currentArgsString, args) 
     commaIndex = argsString[commaIndex+1:].find(",")
   # The last arg
-  # TODO: Merge above code and below into one function
-  args = parse_one_arg(argsString[prevCommaIndex+1:], args)
+  if prevCommaIndex == 0:
+    # One arg only in argsString
+    args = parse_one_arg(argsString, args)
+  else:
+    args = parse_one_arg(argsString[prevCommaIndex+1:], args)
   return args
 
 def compile(path, outpath):
@@ -226,6 +208,7 @@ def compile(path, outpath):
               outf.write(" mov rax, 0x2000004\n")
               outf.write(" mov rdi, 1\n")
               outf.write(" mov rsi, " + args[0] + "\n")
+              print("args: " + str(args))
               internalVarNameIndex = internalVarNames.index(args[0])
               if internalVarNameIndex == -1:
                 print("PARTY ERROR: Variable not declared.")
@@ -233,18 +216,6 @@ def compile(path, outpath):
                 return
               outf.write(" mov rdx, " + str(internalStringsLen[internalVarNameIndex]) + "\n")
               outf.write(" syscall\n")
-              '''
-              # We only support a maximum of 5 args ATM.
-              # This is an array of the x86 calling conversions
-              registerCallingConversions = ["rdi", "rsi", "rdx", "r8", "r9"]
-              argc = 0
-              for arg in args:
-                if argc == 5:
-                  print("PARTY ERROR: Too many arguments for println.")
-                registerForArg = registerCallingConversions[argc]
-                outf.write(" mov " + registerForArg + ", " + arg + "\n")
-                argc += 1
-            '''
             elif existingName == "exit":
               # exit declaration; we only do exit(0)
               outf.write(" mov rax, 0x2000001\n mov rdi, 0\n syscall\n")
