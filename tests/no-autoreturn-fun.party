@@ -1,0 +1,41 @@
+/* Disable auto return for epic function */
+#define __NO_AUTORETURN 1
+
+funky top_of_ladder {
+  !println("We reached the top of the ladder! Going down!")
+}
+
+funky ladder_down_1 {
+  !println("Step 1...")
+}
+
+funky ladder_down_2 {
+  !println("Step 2...")
+}
+
+funky ladder_down_3 {
+  !println("Step 3...")
+}
+
+funky floor {
+  !println("We're on the floor; we fell down from the ladder.")
+  !println("Hope you enjoyed this demo of some fun with no auto return!")
+  !println("Exiting now...")
+  !exit
+  return
+}
+
+funky start {
+  !println("Started!")
+  !println("Here is a Party program with auto return disabled. This results in us reaching other functions without calling them!")
+  string toTheTopMsg = "Let's go to the top of the ladder, and then, back down!"
+  !println(toTheTopMsg)
+  !top_of_ladder
+  /*
+  We already had an !exit in floor,
+  So we should have exited there...
+  */
+  !println("We should not reach here.")
+  !exit
+  return
+}
