@@ -54,6 +54,25 @@ funky start {
   blind {
   mov rdi, 0 ;blind inline assembly!
   }
+  !println("We are now going to save a string variable.")
+  !println("In Party; you need to give a default value when declaring variables; you can't just declare them.")
+  string coolBeans = "This is a string variable, and because of that, I can use commas and ()!"
+  !println(coolBeans)
+  string weCanDoThisNow = "We can also declare integers, too."
+  !println(weCanDoThisNow)
+  /*
+   0x2000001 is the syscall number for
+   XNU/BSD's syscall, exit, which
+   calls upon the kernel to end our
+   program. In Party, currently
+   all variables are saved to
+   the __DATA segment, even
+   local variables in functions.
+   In the future, we probably want
+   to keep local variables in
+   __TEXT, but I mean, this works...
+   */
+  int exitSyscallNumber = 0x2000001
   !println("This is the end of the sample. We're going to exit using !exit.")
   !println("!exit is a wrapper for exit[0] syscall.")
   !println("This is all for our sample. Bye for now!")

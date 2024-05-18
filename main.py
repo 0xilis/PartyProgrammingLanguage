@@ -73,6 +73,9 @@ def super_duper_arg_parser(argsString):
   if argsString.startswith("("):
     # Dumb workaround... remove ( if start of argsString
     argsString = argsString[1:]
+  if argsString.endswith(")"):
+    # Dumb workaround... remove ) if end of argsString
+    argsString = argsString[:-1]
   args = []
   currentArgsString = argsString
   commaIndex = argsString.find(",")
@@ -195,14 +198,32 @@ def compile(path, outpath):
               existingName = nospaces.replace("\n", "")[1:]
             else:
               existingName = nospaces.replace("\n", "")[1:argBeginIndex]
-            if existingName == "println":
-              # println declaration
+            if existingName == "print":
+              # print declaration
               argBeginIndex = inputline.find("(")
               # TODO: Oh yeah uh this will have problems with strings that contain ) oops
               argEndIndex = inputline.find(")")
               argsString = inputline[argBeginIndex:argEndIndex]
               # TODO: Check for valid arguments
               # TODO: Check __DATA_cache to see arg
+              args = super_duper_arg_parser(argsString)
+              # println is special in the syscall wrappers
+              outf.write(" mov rax, 0x2000004\n")
+              outf.write(" mov rdi, 1\n")
+              outf.write(" mov rsi, " + args[0] + "\n")
+              print("args: " + str(args))
+              internalVarNameIndex = internalVarNames.index(args[0])
+              if internalVarNameIndex == -1:
+                print("PARTY ERROR: Variable not declared.")
+                end_compile(outf,inf)
+                return
+              outf.write(" mov rdx, " + str(internalStringsLen[internalVarNameIndex]) + "\n")
+              outf.write(" syscall\n")
+            elif existingName == "println":
+              # println declaration
+              argBeginIndex = inputline.find("(")
+              argEndIndex = inputline.find(")")
+              argsString = inputline[argBeginIndex:argEndIndex+1].replace("\")","\\n\"")
               args = super_duper_arg_parser(argsString)
               # println is special in the syscall wrappers
               outf.write(" mov rax, 0x2000004\n")
@@ -267,6 +288,35 @@ def compile(path, outpath):
             # Nothing
             print("Nothing")
             outf.write(" nop\n")
+          else:
+            # Var declaration parsing
+            strstart = inputline.find("string ")
+            intstart = inputline.find("int ")
+            if strstart != -1:
+              # String declaration
+              print("String declaration")
+              noDeclare = inputline[strstart+7:]
+              equalSignIndex = noDeclare.find("=")
+              stringName = noDeclare[:equalSignIndex].replace(" ","")
+              stringToSave = noDeclare[equalSignIndex+1:].replace("\n","")
+              stringToSaveRaw = stringToSave.replace("\"", "")
+              stringToSaveRawLen = len(stringToSaveRaw)
+              declaredVariables.append(stringName)
+              internalVarNames.append(stringName)
+              internalStringsLen.append(stringToSaveRawLen)
+              init_segment_data()
+              segment_data += stringName + ": db \"" + stringToSaveRaw + "\"," + str(stringToSaveRawLen) + "\n"
+            elif intstart != -1:
+              # Integer declaration
+              print("Integer declaration")
+              noDeclare = inputline[intstart+4:]
+              equalSignIndex = noDeclare.find("=")
+              intName = noDeclare[:equalSignIndex].replace(" ","")
+              intToSave = noDeclare[equalSignIndex+1:].replace("\n","")
+              declaredVariables.append(intName)
+              init_segment_data()
+              # dq for quadword, 64 bit
+              segment_data += intName + ": dq " + intToSave + "\n"
   outf.write(segment_data)
   inf.close()
   outf.close()
