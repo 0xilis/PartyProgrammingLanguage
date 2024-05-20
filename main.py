@@ -9,7 +9,6 @@ import os
 # Array for existing function names
 declaredFunctions = []
 # Array for existing variable names; DOES NOT INCLUDE PartyInternalVar_ !!!
-declaredVariables = []
 segment_data = "" # __DATA section, added after __TEXT
 protoVarName = "PartyInternalVar_"
 protoVarCount = 0
@@ -54,13 +53,7 @@ def parse_one_arg(argString, args):
     args.append(internalVarName)
   else:
     # Int or var name
-    currentArgsStringNoSpace = argString.replace(" ", "")
-    if currentArgsStringNoSpace in declaredVariables:
-      # Var name
-      args.append(currentArgsStringNoSpace)
-    else:
-      # Integer
-      args.append(currentArgsStringNoSpace)
+    args.append(currentArgsStringNoSpace)
   return args
 
 def super_duper_arg_parser(argsString):
@@ -277,7 +270,6 @@ def compile(path, outpath):
               stringToSave = noDeclare[equalSignIndex+1:].replace("\n","")
               stringToSaveRaw = stringToSave.replace("\"", "")
               stringToSaveRawLen = len(stringToSaveRaw)
-              declaredVariables.append(stringName)
               internalVarNames.append(stringName)
               internalStringsLen.append(stringToSaveRawLen)
               init_segment_data()
@@ -289,7 +281,6 @@ def compile(path, outpath):
               equalSignIndex = noDeclare.find("=")
               intName = noDeclare[:equalSignIndex].replace(" ","")
               intToSave = noDeclare[equalSignIndex+1:].replace("\n","")
-              declaredVariables.append(intName)
               init_segment_data()
               # dq for quadword, 64 bit
               segment_data += intName + ": dq " + intToSave + "\n"
